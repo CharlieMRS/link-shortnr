@@ -19,7 +19,11 @@
                     e.preventDefault();
 
                     post().then(function (results) {
-                        console.log(results.shortUrl);
+                        if (results.error) {
+                            alert(results.error);
+                        } else {
+                            console.log(results.shortUrl);
+                        }
                     }, function (e) {
                         console.log(e.statusText);
                     });

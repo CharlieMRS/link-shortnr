@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Redirect;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class RedirectController extends AbstractController
 {
@@ -29,6 +30,12 @@ class RedirectController extends AbstractController
         $longUrl = $request->get('longUrl');
         $entityManager = $this->getDoctrine()->getManager();
 
+        try {
+            $this->checkUnique($longUrl);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => $e->getMessage()]);
+        }
+
         $redirect = new Redirect();
         $redirect->setLongUrl($longUrl);
         $redirect->setShortUrl($this->getRandomString());
@@ -39,7 +46,7 @@ class RedirectController extends AbstractController
         return $this->json(['shortUrl' => $longUrl]);
     }
 
-    function getRandomString(int $len = 9) {
+    private function getRandomString(int $len = 9) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -47,6 +54,14 @@ class RedirectController extends AbstractController
             $randomString .= $characters[ rand(0, $charactersLength - 1) ];
         }
         return $randomString;
+    }
+
+    private function checkUnique(string $longUrl)
+    {
+        $repo = $this->getDoctrine()->getRepository(Redirect::class);
+        if ($repo->findOneBy(['longUrl' => $longUrl])) {
+            throw new InvalidArgumentException('That url has already been shortened. Please choose another.');
+        }
     }
 
 }
