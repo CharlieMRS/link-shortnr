@@ -12,20 +12,27 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
             $(function() {
+
                 var $form = $('form');
                 var $input = $form.find('[name=longUrl]');
                 $form.submit(function (e) {
                     e.preventDefault();
 
-                    $.ajax({
+                    post().then(function (results) {
+                        console.log(results.shortUrl);
+                    }, function (e) {
+                        console.log(e.statusText);
+                    });
+
+                });
+
+                function post() {
+                    return $.ajax({
                         type:'POST',
                         url:"{{ url('shortenUrl') }}",
-                        data: {longUrl: $input.val()},
-                        success:function(results){
-                            console.log(results.shortUrl);
-                        }
+                        data: {longUrl: $input.val()}
                     });
-                });
+                }
             });
 
         </script>
