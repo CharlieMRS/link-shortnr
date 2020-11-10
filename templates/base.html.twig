@@ -6,7 +6,28 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        <form action="">
+            <input type="text" name="longUrl">
+        </form>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(function() {
+                var $form = $('form');
+                var $input = $form.find('[name=longUrl]');
+                $form.submit(function (e) {
+                    e.preventDefault();
+
+                    $.ajax({
+                        type:'POST',
+                        url:"{{ url('shortenUrl') }}",
+                        data: {longUrl: $input.val()},
+                        success:function(results){
+                            console.log(results.shortUrl);
+                        }
+                    });
+                });
+            });
+
+        </script>
     </body>
 </html>
