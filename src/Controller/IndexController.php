@@ -18,14 +18,4 @@ class IndexController extends AbstractController
 
         ]);
     }
-
-    /**
-     * @Route("shortenUrl", name="shortenUrl")
-     */
-    public function shortenUrl(Request $request)
-    {
-        return $this->json(['shortUrl' => $request->get('longUrl')]);
-
-    }
-
 }
