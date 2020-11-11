@@ -3,18 +3,20 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+            <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+        {% endblock %}
     </head>
     <body>
     <h1><a href="/">Home</a></h1>
         {% block body %}
             <div id="home">
-                <form action="">
+                <form action="" class="info">
                     <input type="url" name="longUrl">
                     <input type="submit">
                 </form>
             </div>
-            <div id="info" display="none"></div>
+            <div id="info" class="info" style="display: none;"></div>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script>
                 $(function() {
@@ -22,6 +24,7 @@
                     var $form = $('form');
                     var $input = $form.find('[name=longUrl]');
 
+                    var $home = $('#home');
                     var $infoPage = $('#info');
 
                     $form.submit(function (e) {
@@ -29,12 +32,12 @@
 
                         post().then(function (results) {
                             if (results.error) {
-                                alert(results.error);
+                                displayError(results.error);
                             } else {
                                 displayLinkInfo(results);
                             }
                         }, function (e) {
-                            console.log(e.statusText);
+                            displayError(e.statusText);
                         });
 
                     });
@@ -48,7 +51,14 @@
                     }
 
                     function displayLinkInfo(html) {
-                        $infoPage.html(html).toggle();
+                        var successMsg = '<span class="success">Woohoo! Your shortened link is ready.</span>';
+                        $infoPage.html(successMsg + html).toggle();
+                        $home.toggle();
+                    }
+                    function displayError(msg) {
+                        var errorMsg = '<span class="error">' + msg + '</span>';
+                        $home.prepend(errorMsg);
+
                     }
                 });
 
