@@ -1,3 +1,7 @@
 <span>{{ longUrl }}</span>
 <span>-></span>
 <span>{{ url('redirect', {slug: shortUrl}) }}</span>
+<form action="{{ url('deleteLink') }}">
+    <input type="hidden" name="id" value="{{ linkId }}">
+    <input type="submit" value="Delete" class="delete">
+</form>

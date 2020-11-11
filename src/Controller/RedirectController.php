@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\RedirectRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Redirect;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,9 +18,8 @@ class RedirectController extends AbstractController
      */
     public function index(string $slug): Response
     {
-        $repo = $this->getDoctrine()->getRepository(Redirect::class);
         /** @var Redirect $redirect */
-        $redirect = $repo->findOneBy(['shortUrl' => $slug]);
+        $redirect = $this->getRepo()->findOneBy(['shortUrl' => $slug]);
         return $this->redirect($redirect->getLongUrl());
     }
 
@@ -46,6 +46,7 @@ class RedirectController extends AbstractController
         $entityManager->flush();
 
         return $this->render('redirect/index.html.twig', [
+            'linkId' => $redirect->getId(),
             'longUrl' => $longUrl,
             'shortUrl' => $shortUrl
         ]);
@@ -56,18 +57,37 @@ class RedirectController extends AbstractController
      */
     public function view(string $link)
     {
-        $repo = $this->getDoctrine()->getRepository(Redirect::class);
-        /** @var Redirect $redirect */
-        $redirect = $repo->findOneBy(['shortUrl' => $link]);
+        $redirect = $this->getRepo()->findOneBy(['shortUrl' => $link]);
 
         return $this->render('info.html.twig', [
+            'linkId' => $redirect->getId(),
             'longUrl' => $redirect->getLongUrl(),
-            'shortUrl' => $redirect->getShortUrl(),
-            'page' => true
+            'shortUrl' => $redirect->getShortUrl()
         ]);
     }
 
-    private function getRandomString(int $len = 9) {
+    /**
+     * @Route("deleteLink", name="deleteLink")
+     */
+    public function delete(Request $request): Response
+    {
+        $id = $request->get('id');
+        $link = $this->getRepo()->find($id);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($link);
+        $entityManager->flush();
+
+        $this->addFlash(
+            'notice',
+            'Your short link was deleted.'
+        );
+
+        return $this->redirect('/');
+    }
+
+    private function getRandomString(int $len = 9): string
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -79,10 +99,14 @@ class RedirectController extends AbstractController
 
     private function checkUnique(string $longUrl)
     {
-        $repo = $this->getDoctrine()->getRepository(Redirect::class);
-        if ($repo->findOneBy(['longUrl' => $longUrl])) {
+        if ($this->getRepo()->findOneBy(['longUrl' => $longUrl])) {
             throw new InvalidArgumentException('That url has already been shortened. Please choose another.');
         }
+    }
+
+    private function getRepo(): RedirectRepository
+    {
+        return $this->getDoctrine()->getRepository(Redirect::class);
     }
 
 }

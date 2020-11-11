@@ -32,3 +32,7 @@ form input[type="url"] {
 #info, #home {
     position: relative;
 }
+
+.delete {
+    color: red;
+}
