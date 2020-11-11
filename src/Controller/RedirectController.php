@@ -25,25 +25,29 @@ class RedirectController extends AbstractController
     /**
      * @Route("shortenUrl", name="shortenUrl")
      */
-    public function createRedirect(Request $request): JsonResponse
+    public function createRedirect(Request $request): Response
     {
         $longUrl = $request->get('longUrl');
-        $entityManager = $this->getDoctrine()->getManager();
-
         try {
             $this->checkUnique($longUrl);
         } catch (\InvalidArgumentException $e) {
             return $this->json(['error' => $e->getMessage()]);
         }
 
+        $entityManager = $this->getDoctrine()->getManager();
+        $shortUrl = $this->getRandomString();
+
         $redirect = new Redirect();
         $redirect->setLongUrl($longUrl);
-        $redirect->setShortUrl($this->getRandomString());
+        $redirect->setShortUrl($shortUrl);
 
         $entityManager->persist($redirect);
         $entityManager->flush();
 
-        return $this->json(['shortUrl' => $longUrl]);
+        return $this->render('info.html.twig', [
+            'longUrl' => $longUrl,
+            'shortUrl' => $shortUrl
+        ]);
     }
 
     private function getRandomString(int $len = 9) {

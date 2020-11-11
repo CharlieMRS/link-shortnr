@@ -6,15 +6,23 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
-        <form action="">
-            <input type="url" name="longUrl">
-        </form>
+        <a href="/">Home</a>
+        <div id="home">
+            <form action="">
+                <input type="url" name="longUrl">
+                <input type="submit">
+            </form>
+        </div>
+        <div id="info" display="none"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
             $(function() {
 
                 var $form = $('form');
                 var $input = $form.find('[name=longUrl]');
+
+                var $infoPage = $('#info');
+
                 $form.submit(function (e) {
                     e.preventDefault();
 
@@ -22,7 +30,7 @@
                         if (results.error) {
                             alert(results.error);
                         } else {
-                            console.log(results.shortUrl);
+                            displayLinkInfo(results);
                         }
                     }, function (e) {
                         console.log(e.statusText);
@@ -36,6 +44,10 @@
                         url:"{{ url('shortenUrl') }}",
                         data: {longUrl: $input.val()}
                     });
+                }
+
+                function displayLinkInfo(html) {
+                    $infoPage.html(html).toggle();
                 }
             });
 
