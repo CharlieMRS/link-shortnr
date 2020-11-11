@@ -1,3 +1,5 @@
-<span>{{ shortUrl }}</span>
-<span>-></span>
-<span>{{ longUrl }}</span>
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ include('redirect/index.html.twig') }}
+{% endblock %}

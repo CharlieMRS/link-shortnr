@@ -25,7 +25,7 @@ class RedirectController extends AbstractController
     /**
      * @Route("shortenUrl", name="shortenUrl")
      */
-    public function createRedirect(Request $request): Response
+    public function create(Request $request): Response
     {
         $longUrl = $request->get('longUrl');
         try {
@@ -44,9 +44,25 @@ class RedirectController extends AbstractController
         $entityManager->persist($redirect);
         $entityManager->flush();
 
-        return $this->render('info.html.twig', [
+        return $this->render('redirect/index.html.twig', [
             'longUrl' => $longUrl,
             'shortUrl' => $shortUrl
+        ]);
+    }
+
+    /**
+     * @Route("view/{link}", name="view")
+     */
+    public function view(string $link)
+    {
+        $repo = $this->getDoctrine()->getRepository(Redirect::class);
+        /** @var Redirect $redirect */
+        $redirect = $repo->findOneBy(['shortUrl' => $link]);
+
+        return $this->render('info.html.twig', [
+            'longUrl' => $redirect->getLongUrl(),
+            'shortUrl' => $redirect->getShortUrl(),
+            'page' => true
         ]);
     }
 

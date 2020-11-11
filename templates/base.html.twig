@@ -6,51 +6,54 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
-        <a href="/">Home</a>
-        <div id="home">
-            <form action="">
-                <input type="url" name="longUrl">
-                <input type="submit">
-            </form>
-        </div>
-        <div id="info" display="none"></div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script>
-            $(function() {
+    <h1><a href="/">Home</a></h1>
+        {% block body %}
+            <div id="home">
+                <form action="">
+                    <input type="url" name="longUrl">
+                    <input type="submit">
+                </form>
+            </div>
+            <div id="info" display="none"></div>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script>
+                $(function() {
 
-                var $form = $('form');
-                var $input = $form.find('[name=longUrl]');
+                    var $form = $('form');
+                    var $input = $form.find('[name=longUrl]');
 
-                var $infoPage = $('#info');
+                    var $infoPage = $('#info');
 
-                $form.submit(function (e) {
-                    e.preventDefault();
+                    $form.submit(function (e) {
+                        e.preventDefault();
 
-                    post().then(function (results) {
-                        if (results.error) {
-                            alert(results.error);
-                        } else {
-                            displayLinkInfo(results);
-                        }
-                    }, function (e) {
-                        console.log(e.statusText);
+                        post().then(function (results) {
+                            if (results.error) {
+                                alert(results.error);
+                            } else {
+                                displayLinkInfo(results);
+                            }
+                        }, function (e) {
+                            console.log(e.statusText);
+                        });
+
                     });
 
+                    function post() {
+                        return $.ajax({
+                            type:'POST',
+                            url:"{{ url('shortenUrl') }}",
+                            data: {longUrl: $input.val()}
+                        });
+                    }
+
+                    function displayLinkInfo(html) {
+                        $infoPage.html(html).toggle();
+                    }
                 });
 
-                function post() {
-                    return $.ajax({
-                        type:'POST',
-                        url:"{{ url('shortenUrl') }}",
-                        data: {longUrl: $input.val()}
-                    });
-                }
+            </script>
+        {% endblock %}
 
-                function displayLinkInfo(html) {
-                    $infoPage.html(html).toggle();
-                }
-            });
-
-        </script>
     </body>
 </html>
