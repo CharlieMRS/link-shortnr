@@ -13,13 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 class RedirectController extends AbstractController
 {
     /**
-     * @Route("/redirect", name="redirect")
+     * @Route("/r/{slug}", name="redirect")
      */
-    public function index(): Response
+    public function index(string $slug): Response
     {
-        return $this->render('redirect/index.html.twig', [
-            'controller_name' => 'RedirectController',
-        ]);
+        $repo = $this->getDoctrine()->getRepository(Redirect::class);
+        /** @var Redirect $redirect */
+        $redirect = $repo->findOneBy(['shortUrl' => $slug]);
+        return $this->redirect($redirect->getLongUrl());
     }
 
     /**
@@ -67,7 +68,7 @@ class RedirectController extends AbstractController
     }
 
     private function getRandomString(int $len = 9) {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
         $charactersLength = strlen($characters);
         $randomString = '';
         for ($i = 0; $i < $len; $i++) {
