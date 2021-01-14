@@ -17,7 +17,7 @@ migration_versions\
 
 Upon valid url input, AJAX post the form, controller checks if its unique and throws exception if not. It then generates a random 9-character random alphanumeric string and persists it as property on Redirect data object (entity). A rendered twig template is returned to AJAX success handler, which appends it to empty div and hides the home page
 
-#### View Link (Http Request)
+#### View Link - /view/{identifier} (Http Request)
 
 Simple lookup using Doctrine ORM. Renders same template used in Ajax request but from within a twig template that extends the base template since it's a standard http request
 
